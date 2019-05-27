@@ -8,7 +8,8 @@ if(isset($_POST['login']))
     $username = mysqli_real_escape_string($con,$_POST['username']);
     $pwd = mysqli_real_escape_string($con,$_POST['pwd']);
 
-    $pass = md5($pwd); //md5
+    $pass = md5($pwd); //crypting password using md5 
+    
     $sql= "SELECT id FROM user WHERE username = '$username' AND password = '$pass'";
     
     $result = mysqli_query($con,$sql);
@@ -18,7 +19,6 @@ if(isset($_POST['login']))
         echo "connected as ".mysqli_fetch_assoc($result)['id'];
     else 
     {
-        ////
         echo "username and/or password invalid :(";
         header('location: ../index.php?err=1');
     }
@@ -27,7 +27,7 @@ if(isset($_POST['login']))
 //REGISTRATION
 if(isset($_POST['register']))
 {
-    $min_pwd_len = 3;
+    $min_pwd_len = 3; //required length for password 
 
     print_r($_POST);
     $username =mysqli_real_escape_string($con,$_POST['username']);
@@ -38,15 +38,18 @@ if(isset($_POST['register']))
     //check if username or email already exist in database 
     $sql = "SELECT id FROM user WHERE username = '$username' OR email = '$email'";
     $result = mysqli_query($con,$sql);
+    
     if(mysqli_num_rows($result) != 0)
+        //email or username already exist in database
         header("location: ../register.php?err=1");
     else{
         //check if passwords match
         if($pwd1 != $pwd2 || strlen($pwd1) < $min_pwd_len)
+            //passwords do not match or too short
             header("location: ../register.php?err=2");
         else{
             //add user data to db
-            $pwd = md5($pwd1);
+            $pwd = md5($pwd1); //turn password to md5 
             $sql="INSERT INTO user(username,password,email)
                     VALUES ('$username','$pwd','$email')";
             if(mysqli_query($con,$sql))
